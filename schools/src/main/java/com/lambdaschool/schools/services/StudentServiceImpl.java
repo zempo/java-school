@@ -1,5 +1,6 @@
 package com.lambdaschool.schools.services;
 
+import com.lambdaschool.schools.exceptions.ResourceNotFoundException;
 import com.lambdaschool.schools.models.Course;
 import com.lambdaschool.schools.models.StudCourses;
 import com.lambdaschool.schools.models.Student;
@@ -8,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,7 +17,7 @@ import java.util.List;
  */
 @Service(value = "studentService")
 public class StudentServiceImpl
-    implements StudentService
+        implements StudentService
 {
     /**
      * Connects this service to the Student table.
@@ -40,8 +40,8 @@ public class StudentServiceImpl
          * iterate over the iterator set and add each element to an array list.
          */
         studentrepos.findAll()
-            .iterator()
-            .forEachRemaining(list::add);
+                .iterator()
+                .forEachRemaining(list::add);
         return list;
     }
 
@@ -49,7 +49,7 @@ public class StudentServiceImpl
     public Student findStudentById(long id)
     {
         return studentrepos.findById(id)
-            .orElseThrow(() -> new EntityNotFoundException("Student id " + id + " not found!"));
+                .orElseThrow(() -> new ResourceNotFoundException("Student id " + id + " not found!"));
     }
 
     @Transactional
@@ -57,7 +57,7 @@ public class StudentServiceImpl
     public void delete(long id)
     {
         studentrepos.findById(id)
-            .orElseThrow(() -> new EntityNotFoundException("Student id " + id + " not found!"));
+                .orElseThrow(() -> new ResourceNotFoundException("Student id " + id + " not found!"));
         studentrepos.deleteById(id);
     }
 
@@ -70,7 +70,7 @@ public class StudentServiceImpl
         if (student.getStudentid() != 0)
         {
             Student oldStudent = studentrepos.findById(student.getStudentid())
-                .orElseThrow(() -> new EntityNotFoundException("Student id " + student.getStudentid() + " not found!"));
+                    .orElseThrow(() -> new ResourceNotFoundException("Student id " + student.getStudentid() + " not found!"));
 
             newStudent.setStudentid(student.getStudentid());
         }
@@ -78,15 +78,15 @@ public class StudentServiceImpl
         newStudent.setName(student.getName());
 
         newStudent.getCourses()
-            .clear();
+                .clear();
         for (StudCourses sc : student.getCourses())
         {
             Course newCourse = coursesService.findCourseById(sc.getCourse()
-                .getCourseid());
+                    .getCourseid());
 
             newStudent.getCourses()
-                .add(new StudCourses(newCourse,
-                    newStudent))
+                    .add(new StudCourses(newCourse,
+                            newStudent))
             ;
         }
 
